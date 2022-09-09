@@ -33,19 +33,13 @@ public class ClientController implements Initializable {
     @FXML
     private ScrollPane scroll;
 
-    private Client client;
+    private Client client=null;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try{
-            client = new Client(new Socket("localhost",1234));
-            System.out.println("Client connection created");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Client not created");
-        }
+
+
 
         messages.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -59,13 +53,13 @@ public class ClientController implements Initializable {
 
 
 
-        client.getServerMessages(messages);
+
 
         SendButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String sendingMessage=tfMessages.getText();
-                if(!sendingMessage.isEmpty()){
+                if(!sendingMessage.isEmpty()&&client!=null){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
                     Text text = new Text(sendingMessage);
@@ -86,6 +80,23 @@ public class ClientController implements Initializable {
                 }
             }
         });
+        new Thread(()->{
+            boolean connection=false;
+            while (connection==false){
+                try{
+                    Thread.sleep(1000);
+                    client = new Client(new Socket("localhost",1234));
+                    System.out.println("Client connection created");
+                    connection=true;
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println("Client not created");
+                }
+            }
+
+            client.getServerMessages(messages);
+        }).start();
     }
 
     public static void newLabel(String clientMessage,VBox vBox){

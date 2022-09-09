@@ -61,12 +61,19 @@ public class Server {
         }).start();
     }
 
-    public boolean serverStatus(){
-        if(socket.isConnected())return true;
-        else return false;
+    public Socket getSocket() {
+        return socket;
     }
 
-    public void closeServer(Socket socket,BufferedReader bufferedReader,BufferedWriter bufferedWriter){
+    public BufferedReader getBufferedReader() {
+        return bufferedReader;
+    }
+
+    public BufferedWriter getBufferedWriter() {
+        return bufferedWriter;
+    }
+
+    public void closeServer(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         try{
             if (bufferedReader!= null){
                 bufferedReader.close();

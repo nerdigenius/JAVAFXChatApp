@@ -10,16 +10,16 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import java.net.ServerSocket;
 import java.net.URL;
@@ -35,7 +35,8 @@ public class ChatController implements Initializable {
     @FXML
     private ScrollPane scroll;
 
-    private Server server;
+    private Server server=null;
+
 
 
     @Override
@@ -52,15 +53,11 @@ public class ChatController implements Initializable {
        messages.setBackground(new Background(new BackgroundFill(null,null,null)));
        scroll.setFitToWidth(true);
 
-
-
-
-
         SendButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String sendingMessage=tfMessages.getText();
-                if(!sendingMessage.isEmpty()){
+                if(!sendingMessage.isEmpty()&&server!=null){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
                     Text text = new Text(sendingMessage);
@@ -82,19 +79,25 @@ public class ChatController implements Initializable {
             }
         });
 
-        try{
-            server = new Server(new ServerSocket(1234));
-            System.out.println("Server  created");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Server not created");
-        }
+        new Thread(()->{
+                try{
+                    server = new Server(new ServerSocket(1234));
+                    System.out.println("Server  created");
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println("Server not created");
+                }
 
-            server.getClientMessage(messages);
+                server.getClientMessage(messages);
+            }
+        ).start();
+
+
 
 
     }
+
 
     public static void newLabel(String clientMessage,VBox vBox){
         HBox hBox = new HBox();
@@ -110,11 +113,6 @@ public class ChatController implements Initializable {
         textFlow.setMaxWidth(200);
         hBox.getChildren().add(textFlow);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                vBox.getChildren().add(hBox);
-            }
-        });
+        Platform.runLater(() -> vBox.getChildren().add(hBox));
     }
 }
