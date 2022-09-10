@@ -27,6 +27,9 @@ public class Network {
             System.out.println("Server Error");
             e.printStackTrace();
         }
+        finally {
+            closeServer(socket,bufferedReader,bufferedWriter);
+        }
 
     }
 
@@ -52,6 +55,10 @@ public class Network {
 
     public BufferedWriter getBufferedWriter() {
         return bufferedWriter;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 
     public void closeServer(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){

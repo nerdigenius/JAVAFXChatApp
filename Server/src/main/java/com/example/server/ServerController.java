@@ -25,8 +25,8 @@ public class ServerController implements Initializable {
     Circle circle;
 
    Network network=null;
-   ArrayList<Network> networkArrayList=new ArrayList<>();
-   int i=0;
+
+   ArrayList<ClientHandler> clientHandlerArrayList = new ArrayList<>();
 
 
 
@@ -41,13 +41,13 @@ public class ServerController implements Initializable {
                     try {
                         while (true){
                             network = new Network(new ServerSocket(1234));
-                            networkArrayList.add(network);
+                            clientHandlerArrayList.add(new ClientHandler(network.getSocket()));
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    i++;
+
                                     circle.setFill(Color.GREEN);
-                                    label.setText("server connected to "+i +"client ....");
+                                    label.setText("server connected to "+clientHandlerArrayList.size() +"client ....");
                                 }
                             });
                         }
@@ -57,6 +57,7 @@ public class ServerController implements Initializable {
 
                     } catch (IOException e) {
                         e.printStackTrace();
+                        button.setDisable(false);
                     }
                 }).start();
 
