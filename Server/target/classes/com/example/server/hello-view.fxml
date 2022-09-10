@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox alignment="BASELINE_CENTER" minHeight="250.0" minWidth="300.0" spacing="40.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.server.ServerController">
+   <children>
+      <Circle fx:id="circle" fill="#ff1f1f" layoutX="150.0" layoutY="49.0" radius="35.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+      <Button fx:id="button" alignment="BASELINE_CENTER" layoutX="108.0" layoutY="170.0" mnemonicParsing="false" text="Click to Start" />
+      <Label fx:id="label" layoutX="114.0" layoutY="108.0" snapToPixel="false" text="Server Closed" />
+   </children>
+   <padding>
+      <Insets top="20.0" />
+   </padding>
+</VBox>
