@@ -9,9 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -24,10 +27,17 @@ public class ServerController implements Initializable {
    @FXML
     Circle circle;
 
-   Network network=null;
 
    ArrayList<ClientHandler> clientHandlerArrayList = new ArrayList<>();
+    ServerSocket serverSocket;
 
+    {
+        try {
+            serverSocket = new ServerSocket(1234);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
@@ -40,8 +50,14 @@ public class ServerController implements Initializable {
                 new Thread(()->{
                     try {
                         while (true){
-                            network = new Network(new ServerSocket(1234));
-                            clientHandlerArrayList.add(new ClientHandler(network.getSocket()));
+
+                            Socket socket=serverSocket.accept();
+
+                            ClientHandler clientHandler=new ClientHandler(socket);
+
+                            clientHandlerArrayList.add(clientHandler);
+                            clientHandler.run();
+
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -60,7 +76,13 @@ public class ServerController implements Initializable {
                         button.setDisable(false);
                     }
                 }).start();
+                Window stage = label.getScene().getWindow();
+                stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent windowEvent) {
 
+                    }
+                });
 
 
             }

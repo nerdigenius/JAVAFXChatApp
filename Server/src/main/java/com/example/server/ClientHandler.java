@@ -35,9 +35,13 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try {
+            while (client.isConnected()){
+                this.bufferedReader=new BufferedReader(new InputStreamReader(client.getInputStream()));
+                this.bufferedWriter=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+                System.out.println(bufferedReader.readLine());
+            }
 
-            this.bufferedReader=new BufferedReader(new InputStreamReader(client.getInputStream()));
-            this.bufferedWriter=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+
         }
         catch (Exception e){
             System.out.println("Server Error");
