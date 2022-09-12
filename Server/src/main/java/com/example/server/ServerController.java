@@ -54,8 +54,6 @@ public class ServerController implements Initializable {
                             Socket socket=serverSocket.accept();
 
                             ClientHandler clientHandler=new ClientHandler(socket);
-
-                            clientHandlerArrayList.add(clientHandler);
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -63,10 +61,11 @@ public class ServerController implements Initializable {
                                 }
                             }).start();
 
+
+
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-
                                     circle.setFill(Color.GREEN);
                                     label.setText("server connected to "+clientHandlerArrayList.size() +"client ....");
                                 }

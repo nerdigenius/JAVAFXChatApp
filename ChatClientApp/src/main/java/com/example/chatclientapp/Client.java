@@ -98,7 +98,6 @@ public class Client {
         catch (Exception e){
             e.printStackTrace();
             System.out.println("Error Sending sendingMessage");
-            closeConnection(socket,bufferedWriter,bufferedReader);
-        }
+           }
     }
 }

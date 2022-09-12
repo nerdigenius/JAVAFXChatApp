@@ -7,6 +7,7 @@ public class ClientHandler implements Runnable{
     private Socket client;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
+    boolean authentic=false;
 
     public ClientHandler(Socket client) throws IOException {
         this.client = client;
@@ -33,7 +34,7 @@ public class ClientHandler implements Runnable{
     }
 
     boolean authenticate(String incomingMsg){
-        /*String[] incomingArray=incomingMsg.split(";");
+        String[] incomingArray=incomingMsg.split(";");
         BufferedReader reader;
        try {
             reader = new BufferedReader(new FileReader("src/main/resources/com/example/server/password"));
@@ -50,9 +51,9 @@ public class ClientHandler implements Runnable{
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
 
-        return true;
+        return false;
     }
     public void sendMessage(String sendingMessage) {
         try {
@@ -68,6 +69,14 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    public Socket getClient() {
+        return client;
+    }
+
+    public boolean isAuthentic() {
+        return authentic;
+    }
+
     @Override
     public void run() {
         String incomingMsg=null;
@@ -78,17 +87,20 @@ public class ClientHandler implements Runnable{
                 incomingMsg=bufferedReader.readLine();
                 System.out.println(incomingMsg);
 
-                    if(authenticate(incomingMsg)){
-
-                        sendMessage("authenticated");
-                        System.out.println("message Sent");
+                    if(authentic==false){
+                        if(authenticate(incomingMsg)) {
+                            sendMessage("authenticated");
+                            System.out.println("message Sent");
+                            authentic=true;
+                        }
+                        else{
+                            client.close();
+                        }
                     }
                     else{
                         sendMessage("error");
+
                     }
-
-
-
 
             }
 
