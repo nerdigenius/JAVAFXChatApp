@@ -4,7 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="500.0" maxWidth="350.0" minHeight="500.0" minWidth="350.0" prefHeight="500.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chatclientapp.ClientController">
+<HBox xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chatclientapp.ClientController">
+<AnchorPane maxHeight="500.0" maxWidth="350.0" minHeight="500.0" minWidth="350" prefHeight="500.0" prefWidth="700">
     <children>
         <Button fx:id="SendButton" layoutX="295.0" layoutY="449.0" maxHeight="25.0" mnemonicParsing="false" text="Send" underline="true" />
         <TextField fx:id="tfMessages" layoutY="449.0" maxHeight="25.0" prefHeight="25.0" prefWidth="281.0" AnchorPane.leftAnchor="10.0" />
@@ -19,3 +20,14 @@
         </Label>
     </children>
 </AnchorPane>
+   <ScrollPane prefHeight="200.0" prefWidth="350.0">
+       <VBox spacing="30.0" alignment="BASELINE_CENTER" prefWidth="350.0">
+         <children>
+            <Button maxWidth="1.7976931348623157E308" prefWidth="150.0" mnemonicParsing="false" text="Button" VBox.vgrow="SOMETIMES" />
+            <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="Button" />
+         </children></VBox>
+   </ScrollPane>
+</HBox>

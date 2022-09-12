@@ -19,6 +19,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import static java.lang.Thread.sleep;
+
 public class ServerController implements Initializable {
    @FXML
    Label label;
@@ -28,7 +30,7 @@ public class ServerController implements Initializable {
     Circle circle;
 
 
-   ArrayList<ClientHandler> clientHandlerArrayList = new ArrayList<>();
+   static ArrayList<ClientHandler> clientHandlerArrayList = new ArrayList<>();
     ServerSocket serverSocket;
 
     {
@@ -53,7 +55,7 @@ public class ServerController implements Initializable {
 
                             Socket socket=serverSocket.accept();
 
-                            ClientHandler clientHandler=new ClientHandler(socket);
+                            ClientHandler clientHandler=new ClientHandler(socket,label,circle);
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -61,15 +63,6 @@ public class ServerController implements Initializable {
                                 }
                             }).start();
 
-
-
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    circle.setFill(Color.GREEN);
-                                    label.setText("server connected to "+clientHandlerArrayList.size() +"client ....");
-                                }
-                            });
                         }
 
 
@@ -93,6 +86,21 @@ public class ServerController implements Initializable {
                 });
 
 
+            }
+        });
+    }
+    public static void addClient(ClientHandler clientHandler){
+        clientHandlerArrayList.add(clientHandler);
+        System.out.println("client array size: "+clientHandlerArrayList.size());
+    }
+
+    public static void updateLabel(Label label,Circle circle){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                circle.setFill(Color.GREEN);
+
+                label.setText("server connected to "+clientHandlerArrayList.size() +"client ....");
             }
         });
     }

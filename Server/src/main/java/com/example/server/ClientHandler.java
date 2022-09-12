@@ -1,19 +1,32 @@
 package com.example.server;
 
+import javafx.scene.control.Label;
+import javafx.scene.shape.Circle;
+
 import java.io.*;
 import java.net.Socket;
+
+import static com.example.server.ServerController.*;
+
 
 public class ClientHandler implements Runnable{
     private Socket client;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     boolean authentic=false;
+    Label label;
+    Circle circle;
+    String username;
 
-    public ClientHandler(Socket client) throws IOException {
+    public ClientHandler(Socket client,Label label, Circle circle) throws IOException {
         this.client = client;
         this.bufferedReader=new BufferedReader(new InputStreamReader(client.getInputStream()));
         this.bufferedWriter=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+        this.label=label;
+        this.circle=circle;
     }
+
+
 
     public void closeServer(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         try{
@@ -43,6 +56,7 @@ public class ClientHandler implements Runnable{
             while (line != null) {
                 String[] arr=line.split(";");
                 if(incomingArray[1].equals(arr[0])&&incomingArray[2].equals(arr[1])){
+                    username=incomingArray[1];
                     return true;
                 }
                 System.out.println(arr[0]);
@@ -77,6 +91,21 @@ public class ClientHandler implements Runnable{
         return authentic;
     }
 
+    public void getAllusers(){
+        String userNames="";
+        for (ClientHandler client:clientHandlerArrayList
+             ) {
+            if(!client.getUsername().equals(username)){
+                userNames=userNames+client.getUsername()+";";
+            }
+        }
+        sendMessage(userNames);
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
     @Override
     public void run() {
         String incomingMsg=null;
@@ -92,13 +121,15 @@ public class ClientHandler implements Runnable{
                             sendMessage("authenticated");
                             System.out.println("message Sent");
                             authentic=true;
+                            addClient(this);
+                            updateLabel(label,circle);
                         }
                         else{
-                            client.close();
+                            closeServer(client,bufferedReader,bufferedWriter);
                         }
                     }
                     else{
-                        sendMessage("error");
+                        getAllusers();
 
                     }
 
