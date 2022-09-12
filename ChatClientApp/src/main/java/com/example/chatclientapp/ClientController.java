@@ -18,7 +18,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -43,6 +42,7 @@ public class ClientController implements Initializable {
 
 
 
+
         messages.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
@@ -61,8 +61,8 @@ public class ClientController implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String sendingMessage=tfMessages.getText();
-
-                System.out.println(client);
+                stage = (Stage) tfMessages.getScene().getWindow();
+                client= (Client) stage.getUserData();
                 if(!sendingMessage.isEmpty()&&client!=null){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -88,8 +88,8 @@ public class ClientController implements Initializable {
             boolean connection=false;
             while (connection==false){
                 try{
-                    Thread.sleep(1000);
-                    client = new Client(new Socket("localhost",1234));
+                    stage = (Stage) tfMessages.getScene().getWindow();
+                    client= (Client) stage.getUserData();
                     System.out.println("Client connection created");
                     connection=true;
                 }
@@ -100,9 +100,7 @@ public class ClientController implements Initializable {
             }
 
             client.getServerMessages(messages);
-
         }).start();
-
     }
 
     public static void newLabel(String clientMessage,VBox vBox){

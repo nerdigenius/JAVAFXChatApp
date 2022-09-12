@@ -81,6 +81,7 @@ public class ClientHandler implements Runnable{
                     if(authenticate(incomingMsg)){
 
                         sendMessage("authenticated");
+                        System.out.println("message Sent");
                     }
                     else{
                         sendMessage("error");
