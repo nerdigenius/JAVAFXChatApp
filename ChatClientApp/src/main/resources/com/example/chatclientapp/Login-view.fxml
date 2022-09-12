@@ -16,7 +16,8 @@
       <Label text="Password" />
       <TextField fx:id="password" />
       <Button fx:id="button" mnemonicParsing="false" text="Login" />
-      <Button mnemonicParsing="false" text="random" fx:id="random" />
+      <Button fx:id="random" mnemonicParsing="false" text="random" />
+      <Label fx:id="error" />
    </children>
    <padding>
       <Insets left="15.0" right="15.0" />

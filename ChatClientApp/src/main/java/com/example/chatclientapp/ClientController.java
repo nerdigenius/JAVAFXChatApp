@@ -17,6 +17,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,7 +37,7 @@ public class ClientController implements Initializable {
 
     private Client client=null;
 
-
+    Stage stage=null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -59,6 +61,8 @@ public class ClientController implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String sendingMessage=tfMessages.getText();
+
+                System.out.println(client);
                 if(!sendingMessage.isEmpty()&&client!=null){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -96,7 +100,9 @@ public class ClientController implements Initializable {
             }
 
             client.getServerMessages(messages);
+
         }).start();
+
     }
 
     public static void newLabel(String clientMessage,VBox vBox){

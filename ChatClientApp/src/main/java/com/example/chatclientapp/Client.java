@@ -40,6 +40,23 @@ public class Client {
             e.printStackTrace();
         }
     }
+    public void closeConnection() {
+        try{
+            if (bufferedReader != null){
+                bufferedReader.close();
+            }
+            if (bufferedWriter != null){
+                bufferedWriter.close();
+            }
+            if (socket!= null){
+                socket.close();
+            }
+        }
+        catch (Exception e){
+            System.out.println("Client Close Error");
+            e.printStackTrace();
+        }
+    }
 
     public void getServerMessages(VBox messages) {
         new Thread(new Runnable() {
@@ -61,6 +78,15 @@ public class Client {
                 }
             }
         }).start();
+    }
+
+    public String getMessage() throws IOException {
+        String clientMessage="none";
+        while (socket.isConnected()){
+            clientMessage = bufferedReader.readLine();
+            return clientMessage;
+        }
+        return clientMessage;
     }
 
     public void sendMessage(String sendingMessage) {

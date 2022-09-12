@@ -56,7 +56,12 @@ public class ServerController implements Initializable {
                             ClientHandler clientHandler=new ClientHandler(socket);
 
                             clientHandlerArrayList.add(clientHandler);
-                            clientHandler.run();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    clientHandler.run();
+                                }
+                            }).start();
 
                             Platform.runLater(new Runnable() {
                                 @Override
@@ -80,7 +85,11 @@ public class ServerController implements Initializable {
                 stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent windowEvent) {
-
+                        try {
+                            serverSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
