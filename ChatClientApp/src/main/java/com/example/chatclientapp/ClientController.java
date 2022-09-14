@@ -35,13 +35,14 @@ public class ClientController implements Initializable {
     private VBox messages,clientList;
     @FXML
     private ScrollPane scroll;
+    @FXML
+    private Label selectedUserLabel,MessengerHeader;
 
     private NetworkUtil client=null;
 
     Stage stage=null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
 
 
 
@@ -66,7 +67,7 @@ public class ClientController implements Initializable {
                 stage = (Stage) tfMessages.getScene().getWindow();
                 UserData userData=(UserData) stage.getUserData();
                 client= userData.getNetworkUtil();
-                if(!sendingMessage.isEmpty()&&client!=null){
+                if(!sendingMessage.isEmpty()&&client!=null&&!selectedUserLabel.getText().isEmpty()){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
                     Text text = new Text(sendingMessage);
@@ -84,7 +85,7 @@ public class ClientController implements Initializable {
 
                     try {
                         Message sendMessage=new Message("MessageTo","MessageFrom",tfMessages.getText(),"Message");
-                        client.write("dashash;"+userData.getUserName()+";"+tfMessages.getText()+";"+"Message");
+                        client.write(selectedUserLabel.getText()+";"+userData.getUserName()+";"+tfMessages.getText()+";"+"Message");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -93,14 +94,27 @@ public class ClientController implements Initializable {
             }
         });
         new Thread(()->{
+            UserData userData = null;
             boolean connection=false;
             while (connection==false){
                 try{
                     stage = (Stage) tfMessages.getScene().getWindow();
-                    UserData userData=(UserData) stage.getUserData();
+                    userData=(UserData) stage.getUserData();
                     client= userData.getNetworkUtil();
                     System.out.println("Client connection created");
                     connection=true;
+                    MessengerHeader.setText(userData.getUserName());
+                    Window window = stage;
+                    window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent windowEvent) {
+                            try {
+                                client.closeConnection();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -111,9 +125,16 @@ public class ClientController implements Initializable {
 
                 try {
                     String message=(String) client.read();
-                    newLabel(message,messages);
+                    if(message.startsWith("list")){
+                        updateUserOnlineList(message, userData.getUserName());
+                    }
+                    else{
+                        newLabel(message,messages);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
+                    break;
                 }
             }
 
@@ -123,7 +144,7 @@ public class ClientController implements Initializable {
 
     public static void newLabel(String clientMessage,VBox vBox){
         String[] messageArray=clientMessage.split(";");
-        if(!messageArray[0].equals("list")){
+
             HBox hBox = new HBox();
             hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
             Text text = new Text(messageArray[2]);
@@ -143,18 +164,39 @@ public class ClientController implements Initializable {
                     vBox.getChildren().add(hBox);
                 }
             });
+
         }
-        else{
+        public void updateUserOnlineList(String list,String userName){
+        String[] messageArray=list.split(";");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                clientList.getChildren().clear();
+            }
+        });
             for (String text:messageArray
-                 ) {
-                if(!text.equals("list")){
-                    Button button=new Button();
+            ) {
+                if (!text.equals("list")&&!text.equals(userName)) {
+                    Button button = new Button();
                     button.setId(text);
+                    button.setMinWidth(150);
+                    button.setText(text);
+                    button.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent actionEvent) {
+                            selectedUserLabel.setText(button.getId());
+                        }
+                    });
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            clientList.getChildren().add(button);
+                        }
+                    });
+
 
                 }
-
             }
         }
 
     }
-}
