@@ -1,5 +1,7 @@
 package com.example.chatclientapp;
 
+import javafx.stage.Window;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,5 +37,6 @@ public class NetworkUtil {
         ois.close();
         oos.close();
     }
+
 }
 

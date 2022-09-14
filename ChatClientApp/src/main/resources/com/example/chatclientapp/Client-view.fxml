@@ -9,25 +9,33 @@
     <children>
         <Button fx:id="SendButton" layoutX="295.0" layoutY="449.0" maxHeight="25.0" mnemonicParsing="false" text="Send" underline="true" />
         <TextField fx:id="tfMessages" layoutY="449.0" maxHeight="25.0" prefHeight="25.0" prefWidth="281.0" AnchorPane.leftAnchor="10.0" />
-        <ScrollPane fx:id="scroll" layoutX="10.0" layoutY="55.0" prefHeight="374.0" prefWidth="330.0">
+        <ScrollPane fx:id="scroll" layoutX="10.0" layoutY="81.0" prefHeight="348.0" prefWidth="330.0">
             <content>
                 <VBox fx:id="messages" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" />
             </content></ScrollPane>
-        <Label layoutX="72.0" layoutY="14.0" text="Client Messenger">
+        <Label fx:id="MessengerHeader" layoutX="72.0" layoutY="14.0">
             <font>
                 <Font name="Arial Bold" size="24.0" />
             </font>
         </Label>
+         <Label layoutX="15.0" layoutY="55.0" text="Current Selected User: " textAlignment="CENTER" underline="true">
+            <font>
+               <Font name="System Bold" size="12.0" />
+            </font>
+         </Label>
+         <Label fx:id="selectedUserLabel" layoutX="172.0" layoutY="55.0" />
     </children>
 </AnchorPane>
-   <ScrollPane prefHeight="200.0" prefWidth="350.0">
-       <VBox spacing="30.0" alignment="BASELINE_CENTER" prefWidth="350.0"  fx:id="clientList">
-         <children>
-            <Button maxWidth="1.7976931348623157E308" prefWidth="150.0" mnemonicParsing="false" text="Button" VBox.vgrow="SOMETIMES" />
-            <Button mnemonicParsing="false" text="Button" />
-            <Button mnemonicParsing="false" text="Button" />
-            <Button mnemonicParsing="false" text="Button" />
-            <Button mnemonicParsing="false" text="Button" />
-         </children></VBox>
-   </ScrollPane>
+   <VBox prefHeight="200.0" prefWidth="350.0">
+      <children>
+         <Label text="Online User List" textAlignment="CENTER">
+            <font>
+               <Font name="System Bold" size="15.0" />
+            </font>
+         </Label>
+         <ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="479.0">
+             <VBox fx:id="clientList" alignment="BASELINE_CENTER" prefWidth="346.0" spacing="30.0" />
+         </ScrollPane>
+      </children>
+   </VBox>
 </HBox>
