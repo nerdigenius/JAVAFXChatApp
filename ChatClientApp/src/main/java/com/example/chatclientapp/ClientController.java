@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -19,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -30,11 +32,11 @@ public class ClientController implements Initializable {
     @FXML
     private TextField tfMessages;
     @FXML
-    private VBox messages;
+    private VBox messages,clientList;
     @FXML
     private ScrollPane scroll;
 
-    private Client client=null;
+    private NetworkUtil client=null;
 
     Stage stage=null;
     @Override
@@ -62,7 +64,8 @@ public class ClientController implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 String sendingMessage=tfMessages.getText();
                 stage = (Stage) tfMessages.getScene().getWindow();
-                client= (Client) stage.getUserData();
+                UserData userData=(UserData) stage.getUserData();
+                client= userData.getNetworkUtil();
                 if(!sendingMessage.isEmpty()&&client!=null){
                     HBox hBox = new HBox();
                     hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -79,7 +82,12 @@ public class ClientController implements Initializable {
                     messages.getChildren().add(hBox);
 
 
-                    client.sendMessage(sendingMessage);
+                    try {
+                        Message sendMessage=new Message("MessageTo","MessageFrom",tfMessages.getText(),"Message");
+                        client.write("dashash;"+userData.getUserName()+";"+tfMessages.getText()+";"+"Message");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     tfMessages.clear();
                 }
             }
@@ -89,7 +97,8 @@ public class ClientController implements Initializable {
             while (connection==false){
                 try{
                     stage = (Stage) tfMessages.getScene().getWindow();
-                    client= (Client) stage.getUserData();
+                    UserData userData=(UserData) stage.getUserData();
+                    client= userData.getNetworkUtil();
                     System.out.println("Client connection created");
                     connection=true;
                 }
@@ -98,29 +107,54 @@ public class ClientController implements Initializable {
                     System.out.println("Client not created");
                 }
             }
+            while (true){
 
-            client.getServerMessages(messages);
+                try {
+                    String message=(String) client.read();
+                    newLabel(message,messages);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
         }).start();
     }
 
     public static void newLabel(String clientMessage,VBox vBox){
-        HBox hBox = new HBox();
-        hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
-        Text text = new Text(clientMessage);
-        text.setFill(Color.WHITE);
-        text.setFont(new Font(13));
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5));
-        TextFlow textFlow = new TextFlow(text);
-        textFlow.setPadding(new Insets(10));
-        textFlow.setBackground(new Background(new BackgroundFill(Color.DARKBLUE,new CornerRadii(10), Insets.EMPTY)));
-        textFlow.setMaxWidth(200);
-        hBox.getChildren().add(textFlow);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                vBox.getChildren().add(hBox);
+        String[] messageArray=clientMessage.split(";");
+        if(!messageArray[0].equals("list")){
+            HBox hBox = new HBox();
+            hBox.setBackground(new Background(new BackgroundFill(null, CornerRadii.EMPTY, Insets.EMPTY)));
+            Text text = new Text(messageArray[2]);
+            text.setFill(Color.WHITE);
+            text.setFont(new Font(13));
+            hBox.setAlignment(Pos.CENTER_LEFT);
+            hBox.setPadding(new Insets(5));
+            TextFlow textFlow = new TextFlow(text);
+            textFlow.setPadding(new Insets(10));
+            textFlow.setBackground(new Background(new BackgroundFill(Color.DARKBLUE,new CornerRadii(10), Insets.EMPTY)));
+            textFlow.setMaxWidth(200);
+            hBox.getChildren().add(new Label(messageArray[1]));
+            hBox.getChildren().add(textFlow);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    vBox.getChildren().add(hBox);
+                }
+            });
+        }
+        else{
+            for (String text:messageArray
+                 ) {
+                if(!text.equals("list")){
+                    Button button=new Button();
+                    button.setId(text);
+
+                }
+
             }
-        });
+        }
+
     }
 }

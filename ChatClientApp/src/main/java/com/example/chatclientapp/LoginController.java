@@ -28,7 +28,7 @@ public class LoginController implements Initializable {
     Label error;
 
 Socket socket;
-    Client client;
+NetworkUtil networkUtil;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -42,13 +42,24 @@ Socket socket;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                client=new Client(socket);
-                    client.sendMessage("authentication;"+username.getText()+";"+password.getText());
                 try {
-                    authentication=client.getMessage();
+                    networkUtil=new NetworkUtil(socket);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                try {
+                    networkUtil.write(username.getText()+";"+password.getText());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    authentication=(String) networkUtil.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
                 if(authentication.equals("authenticated")){
                     Stage stage;
                     Parent root=null;
@@ -59,7 +70,7 @@ Socket socket;
                         e.printStackTrace();
                     }
                     Scene scene = new Scene(root);
-                    stage.setUserData(client);
+                    stage.setUserData(new UserData(username.getText(),networkUtil));
                     stage.setScene(scene);
                     stage.show();
 
@@ -67,14 +78,19 @@ Socket socket;
                 else{
                     error.setTextFill(Color.RED);
                     error.setText("There was an error try again!!!!");
-                    client.closeConnection();
+                    try {
+                        networkUtil.closeConnection();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
         random.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                client.sendMessage(username.getText());
+                //client.sendMessage(username.getText());0
+                System.out.println("Random clicked!!!!!");
             }
         });
     }

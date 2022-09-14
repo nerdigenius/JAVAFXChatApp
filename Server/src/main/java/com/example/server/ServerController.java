@@ -54,8 +54,9 @@ public class ServerController implements Initializable {
                         while (true){
 
                             Socket socket=serverSocket.accept();
+                            NetworkUtil networkUtil=new NetworkUtil(socket);
 
-                            ClientHandler clientHandler=new ClientHandler(socket,label,circle);
+                            ClientHandler clientHandler=new ClientHandler(networkUtil,label,circle);
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -92,15 +93,40 @@ public class ServerController implements Initializable {
     public static void addClient(ClientHandler clientHandler){
         clientHandlerArrayList.add(clientHandler);
         System.out.println("client array size: "+clientHandlerArrayList.size());
+        updateLabel(clientHandler.label,clientHandler.circle);
+    }
+
+    public static void removeClient(String userName){
+        for (ClientHandler client:clientHandlerArrayList
+             ) {
+            if(client.getUsername().equals(userName)){
+                clientHandlerArrayList.remove(client);
+                updateLabel(client.label,client.circle);
+            }
+        }
+
     }
 
     public static void updateLabel(Label label,Circle circle){
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                String clistListToSend="list";
                 circle.setFill(Color.GREEN);
 
                 label.setText("server connected to "+clientHandlerArrayList.size() +"client ....");
+                for (ClientHandler client:clientHandlerArrayList
+                     ) {
+                    clistListToSend=clistListToSend+";"+client.getUsername();
+                }
+                for (ClientHandler client:clientHandlerArrayList
+                ) {
+                    try {
+                        client.writeMessage(clistListToSend);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
     }

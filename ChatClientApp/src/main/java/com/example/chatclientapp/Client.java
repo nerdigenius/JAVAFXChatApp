@@ -58,27 +58,7 @@ public class Client {
         }
     }
 
-    public void getServerMessages(VBox messages) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(socket.isConnected()){
-                    String clientMessage;
-                    try {
-                        clientMessage = bufferedReader.readLine();
-                        ClientController.newLabel(clientMessage,messages);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("Error receiving messages from client");
-                        closeConnection(socket,bufferedWriter,bufferedReader);
-                        break;
-                    }
 
-                }
-            }
-        }).start();
-    }
 
     public String getMessage() throws IOException {
         String clientMessage="none";

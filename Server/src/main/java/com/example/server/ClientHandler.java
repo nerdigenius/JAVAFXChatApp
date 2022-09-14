@@ -4,47 +4,20 @@ import javafx.scene.control.Label;
 import javafx.scene.shape.Circle;
 
 import java.io.*;
-import java.net.Socket;
-
-import static com.example.server.ServerController.*;
 
 
 public class ClientHandler implements Runnable{
-    private Socket client;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
-    boolean authentic=false;
+    private NetworkUtil networkUtil;
     Label label;
     Circle circle;
     String username;
 
-    public ClientHandler(Socket client,Label label, Circle circle) throws IOException {
-        this.client = client;
-        this.bufferedReader=new BufferedReader(new InputStreamReader(client.getInputStream()));
-        this.bufferedWriter=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-        this.label=label;
-        this.circle=circle;
+    public ClientHandler(NetworkUtil networkUtil, Label label, Circle circle) {
+        this.networkUtil = networkUtil;
+        this.label = label;
+        this.circle = circle;
     }
 
-
-
-    public void closeServer(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
-        try{
-            if (bufferedReader!= null){
-                bufferedReader.close();
-            }
-            if (bufferedWriter!= null){
-                bufferedWriter.close();
-            }
-            if (socket!= null){
-                socket.close();
-            }
-        }
-        catch (Exception e){
-            System.out.println("Server Close Error");
-            e.printStackTrace();
-        }
-    }
 
     boolean authenticate(String incomingMsg){
         String[] incomingArray=incomingMsg.split(";");
@@ -55,8 +28,8 @@ public class ClientHandler implements Runnable{
 
             while (line != null) {
                 String[] arr=line.split(";");
-                if(incomingArray[1].equals(arr[0])&&incomingArray[2].equals(arr[1])){
-                    username=incomingArray[1];
+                if(incomingArray[0].equals(arr[0])&&incomingArray[1].equals(arr[1])){
+                    username=incomingArray[0];
                     return true;
                 }
                 System.out.println(arr[0]);
@@ -69,83 +42,72 @@ public class ClientHandler implements Runnable{
 
         return false;
     }
-    public void sendMessage(String sendingMessage) {
-        try {
-            bufferedWriter.write(sendingMessage);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Error Sending sendingMessage");
-            closeServer(client,bufferedReader,bufferedWriter);
-            Thread.currentThread().interrupt();
-        }
-    }
 
-    public Socket getClient() {
-        return client;
-    }
 
-    public boolean isAuthentic() {
-        return authentic;
-    }
-
-    public void getAllusers(){
-        String userNames="";
-        for (ClientHandler client:clientHandlerArrayList
-             ) {
-            if(!client.getUsername().equals(username)){
-                userNames=userNames+client.getUsername()+";";
-            }
-        }
-        sendMessage(userNames);
-    }
 
     public String getUsername() {
         return username;
     }
+    public void writeMessage(Message message) throws IOException {
+        networkUtil.write(message.getMessageTo()+";"+message.getMessageFrom()+";"+message.getTextMessage()+";"+message.getType());
+    }
+    public void writeMessage(String message) throws IOException {
+        networkUtil.write(message);
+    }
 
     @Override
     public void run() {
-        String incomingMsg=null;
-        try {
-            while (client.isConnected()){
-                this.bufferedReader=new BufferedReader(new InputStreamReader(client.getInputStream()));
-                this.bufferedWriter=new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-                incomingMsg=bufferedReader.readLine();
-                System.out.println(incomingMsg);
+        boolean authenticated=false;
+        while (true){
+            if(authenticated==false){
+                try {
+                    String userInfo=(String) networkUtil.read();
+                    authenticated=authenticate(userInfo);
+                    if(authenticated){
+                        networkUtil.write("authenticated");
+                        ServerController.addClient(this);
+                    }
+                    else {
+                        networkUtil.closeConnection();
+                        break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    try {
+                        networkUtil.closeConnection();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
 
-                    if(authentic==false){
-                        if(authenticate(incomingMsg)) {
-                            sendMessage("authenticated");
-                            System.out.println("message Sent");
-                            authentic=true;
-                            addClient(this);
-                            updateLabel(label,circle);
-                        }
-                        else{
-                            closeServer(client,bufferedReader,bufferedWriter);
+            else {
+                try {
+                    String message = (String) networkUtil.read();
+                    String[] incomingArray=message.split(";");
+                    System.out.println(incomingArray[2]);
+                    Message sendMessage = new Message(incomingArray[0],incomingArray[1], incomingArray[2], incomingArray[3]);
+                    for (ClientHandler findClient:ServerController.clientHandlerArrayList
+                         ) {
+                        System.out.println(findClient.getUsername());
+                        if(findClient.getUsername().equals(sendMessage.MessageTo)){
+                            findClient.writeMessage(sendMessage);
                         }
                     }
-                    else{
-                        getAllusers();
 
-                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    ServerController.removeClient(this.username);
+                    break;
+
+                }
 
             }
 
+        }
 
-        }
-        catch (Exception e){
-            System.out.println("Server Error");
-            e.printStackTrace();
-            Thread.currentThread().interrupt();
-        }
-        finally {
-            closeServer(client,bufferedReader,bufferedWriter);
-        }
     }
-
-
 }
