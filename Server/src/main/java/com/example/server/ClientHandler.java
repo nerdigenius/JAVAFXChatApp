@@ -43,6 +43,18 @@ public class ClientHandler implements Runnable{
         return false;
     }
 
+    public void SignUp(String incomingMsg) throws IOException {
+        String[] incomingArray=incomingMsg.split(";");
+        BufferedWriter writer;
+        writer=new BufferedWriter(new FileWriter("src/main/resources/com/example/server/password",true));
+        writer.newLine();
+        writer.write(incomingArray[1]+";"+incomingArray[2]);
+        writer.close();
+        networkUtil.write("Success");
+
+
+    }
+
 
 
     public String getUsername() {
@@ -62,6 +74,10 @@ public class ClientHandler implements Runnable{
             if(authenticated==false){
                 try {
                     String userInfo=(String) networkUtil.read();
+                    if(userInfo.startsWith("SignUp")){
+                        SignUp(userInfo);
+                        break;
+                    }
                     authenticated=authenticate(userInfo);
                     if(authenticated){
                         networkUtil.write("authenticated");

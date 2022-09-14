@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="BASELINE_CENTER" prefHeight="394.0" prefWidth="315.0" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chatclientapp.SignUpController">
+   <children>
+       <Label text="SignUp">
+           <font>
+               <Font name="System Bold" size="21.0" />
+           </font></Label>
+       <Label text="Username" />
+       <TextField fx:id="username" />
+       <Label text="Password" />
+       <TextField fx:id="password" />
+       <Button fx:id="SignUp" mnemonicParsing="false" text="SignUp" />
+       <Label fx:id="error" />
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

@@ -23,7 +23,7 @@ public class LoginController implements Initializable {
 @FXML
     TextField username,password;
 @FXML
-    Button button,random;
+    Button button, SignUp;
 @FXML
     Label error;
 
@@ -86,11 +86,21 @@ NetworkUtil networkUtil;
                 }
             }
         });
-        random.setOnAction(new EventHandler<ActionEvent>() {
+        SignUp.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //client.sendMessage(username.getText());0
-                System.out.println("Random clicked!!!!!");
+                Stage stage;
+                Parent root=null;
+                stage = (Stage) button.getScene().getWindow();
+                try {
+                    root = FXMLLoader.load(getClass().getResource("SignUp-view.fxml"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Scene scene = new Scene(root);
+                stage.setUserData(new UserData(username.getText(),networkUtil));
+                stage.setScene(scene);
+                stage.show();
             }
         });
     }
